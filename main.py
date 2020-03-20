@@ -3,9 +3,10 @@ import numpy as np
 import scipy
 import sklearn
 import csv
-from sklearn.linear_model import RidgeCV
+from sklearn.linear_model import RidgeCV, Lasso, LassoCV, ElasticNetCV, ElasticNet
 from sklearn.metrics import mean_squared_error
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
 
 def calc_function(values, function):
     switch = {
@@ -20,29 +21,32 @@ dataframe = pd.read_csv('train.csv')
 y = dataframe.iloc[:, 1]
 x = dataframe.iloc[:, 2:]
 x = np.array(x)
-
 y = np.array(y)
 
-transforms = np.array(['1' , 'quad' , 'exp' , 'cos'])
 
+transforms = np.array(['1' , 'quad' , 'exp' , 'cos'])
 x_transformed = np.zeros((x.shape[0],21))
 x_transformed[:,20] = np.ones((x_transformed.shape[0]))
+
 for i, transform in enumerate(transforms):
     for j in range(0,5):
         x_transformed[:,i*5+j] = calc_function(x[:,j], transform)
 
-x = preprocessing.scale(x_transformed, axis=1)
-# x = preprocessing.normalize(x, norm='l2', axis=1)
 
 lambdas = list(np.linspace(20,25,100))
-print(lambdas)
+lambdasLasso = list(np.linspace(0,0.1,10))
 
-clf = RidgeCV(alphas=lambdas, cv=10).fit(x_transformed, y)
+clf = RidgeCV(alphas=lambdas, cv=10, fit_intercept=False).fit(x_transformed, y)
+clf2 = LassoCV(alphas=[0.05555555555555556],cv=10, fit_intercept=False).fit(x_transformed, y)
+clf3 = ElasticNetCV(alphas=[0.031578947368421054], l1_ratio=0, cv=10, fit_intercept=False).fit(x_transformed, y)
 lambda_used = clf.alpha_
-weights = clf.coef_
+weights = clf2.coef_
 
-print(lambda_used)
-print(weights)
+#print('ElasticNet: ' + str(np.sqrt(np.mean(clf3.mse_path_, axis=0))))
+#print('RidgeCV: ' + str(np.sqrt(mean_squared_error(y, clf.predict(x_transformed)))))
+#print('LassoCV: ' + str(np.sqrt(np.mean(clf2.mse_path_, axis=0))))
+
+
 
 
 with open('./submission.csv', 'w', newline='') as csvfile:
