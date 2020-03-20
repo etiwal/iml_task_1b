@@ -42,10 +42,6 @@ clf3 = ElasticNetCV(alphas=[0.031578947368421054], l1_ratio=0, cv=10, fit_interc
 lambda_used = clf.alpha_
 weights = clf2.coef_
 
-#print('ElasticNet: ' + str(np.sqrt(np.mean(clf3.mse_path_, axis=0))))
-#print('RidgeCV: ' + str(np.sqrt(mean_squared_error(y, clf.predict(x_transformed)))))
-#print('LassoCV: ' + str(np.sqrt(np.mean(clf2.mse_path_, axis=0))))
-
 
 
 
